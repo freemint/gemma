@@ -57,6 +57,6 @@ objs: .lib$(TARGET)
 	$(AM_V_at)$(CP) Makefile.objs $@/Makefile
 
 clean::
-	rm -rf .lib* gemma*.app
+	rm -rf .lib* gemma*.app *.slb
 
 include $(top_srcdir)/DEPENDENCIES

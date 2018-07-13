@@ -35,5 +35,7 @@ $(TARGET): $(OBJS)
 	$(AM_V_CCLD)$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
 	$(AM_V_STRIP)$(STRIP) $@
 
+clean::
+	$(RM) *.app *.slb
 
 include $(top_srcdir)/DEPENDENCIES
