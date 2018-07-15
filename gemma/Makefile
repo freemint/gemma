@@ -53,7 +53,7 @@ ifeq ($(WITH_020_LIB),yes)
 	install -m 755 -d ${slblibdir}/m68020-60
 	install -m 755 src/gemma32020.slb ${slblibdir}/m68020-60/gemma32.slb
 endif
-	install -m 755 kernel32.slb ${slblibdir}
+	install -m 755 kernel32/.lib/kernel32.slb ${slblibdir}
 
 uninstall:
 	rm -f ${slbincludedir}/gemma-struct.h
