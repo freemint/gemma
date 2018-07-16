@@ -1,12 +1,12 @@
 #
-# Makefile for gemma, a minimal GEM library
+# Makefile for kernel32
 #
 
 SHELL = /bin/sh
 SUBDIRS = 
 
 srcdir = ..
-top_srcdir = ../../..
+top_srcdir = ../..
 subdir = .lib$(TARGET)
 
 default: all
@@ -15,10 +15,13 @@ include $(top_srcdir)/CONFIGVARS
 include $(top_srcdir)/RULES
 include $(top_srcdir)/PHONY
 
-all-here: gemma32.slb
+all-here: kernel32.slb
 
 # default overwrites
-GENERAL += -Wundef
+INCLUDES += 
+CFLAGS += -Wunused -Wextra -Os
+GENERAL +=
+
 ifeq ($(TARGET),020)
 GENERAL += -m68020-60
 endif
@@ -29,15 +32,14 @@ endif
 
 # default definitions
 OBJS = $(SOBJS:.S=.o) $(COBJS:.c=.o)
-LDFLAGS = -nostartfiles -nostdlib
+LDFLAGS = -nostartfiles -nostdlib -s
 LIBS = -lc -lgcc
-GENFILES = gemma32.slb
+GENFILES = kernel32.slb
 
 VPATH = ..
 
-gemma32.slb: $(OBJS)
+kernel32.slb: $(OBJS)
 	$(AM_V_CCLD)$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
-	$(AM_V_STRIP)$(STRIP) $@
 
 
 include $(top_srcdir)/DEPENDENCIES

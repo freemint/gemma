@@ -17,8 +17,8 @@
 
 # include <mint/basepage.h>
 # include <mint/slb.h>
+# include <gem.h>
 
-# include "../../gemlib/gem.h"
 # include "../include/slb/gemma-struct.h"
 
 # include "../config.h"

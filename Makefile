@@ -1,43 +1,83 @@
 #
-# Makefile for lib module
+# Makefile for gemma, a GEM library
 #
 
 SHELL = /bin/sh
-ifndef BUILDLIB
-SUBDIRS = gemlib cflib gemma
-else
-SUBDIRS = $(BUILDLIB)
-include $(BUILDLIB)/VERSION
-endif
+SUBDIRS = libgemma kernel32 documentation libslb src configtool test
+BUILDLIB=gemma
 
 srcdir = .
 top_srcdir = .
 subdir = 
 top_builddir = .
 
+libdir = ${PREFIX}/lib
+slblibdir = ${PREFIX}/../mint/slb
+includedir = ${PREFIX}/include
+slbincludedir = ${includedir}/slb
+
 default: all
 
 include $(top_srcdir)/CONFIGVARS
 include $(top_srcdir)/RULES
 include $(top_srcdir)/PHONY
+include $(srcdir)/VERSION
 
-all-here: 
-
-dist-gemlib:
-	$(MAKE) dist BUILDLIB=gemlib
-
-dist-cflib:
-	$(MAKE) dist BUILDLIB=cflib
-
-dist-gemma:
-	$(MAKE) dist BUILDLIB=gemma
+all-here:
 
 dist: distdir
 	-chmod -R a+r $(distdir) 
 	GZIP=$(GZIP) $(TAR) chzf $(distdir).tar.gz $(distdir)
 	-rm -rf $(distdir)
 
-
 # default overwrites
 
 # default definitions
+
+
+install:
+	install -m 755 -d ${libdir}
+	install -m 755 -d ${slblibdir}
+	install -m 755 -d ${slbincludedir}
+	install -m 644 include/slb/gemma.h ${slbincludedir}
+	install -m 644 include/slb/gemma-struct.h ${slbincludedir}
+	install -m 644 include/slb/kernel.h ${slbincludedir}
+	install -m 644 libgemma/libgemma.a ${libdir}
+ifeq ($(WITH_020_LIB),yes)
+	install -m 755 -d ${libdir}/m68020-60
+	install -m 644 libgemma/libgemma020.a ${libdir}/m68020-60/libgemma.a
+endif
+ifeq ($(WITH_V4E_LIB),yes)
+	install -m 755 -d ${libdir}/m5475
+	install -m 644 libgemma/libgemmav4e.a ${libdir}/m5475/libgemma.a
+endif
+	install -m 755 src/gemma32.slb ${slblibdir}
+ifeq ($(WITH_V4E_LIB),yes)
+	install -m 755 -d ${slblibdir}/m5475
+	install -m 755 src/gemma32v4e.slb ${slblibdir}/m5475/gemma32.slb
+endif
+ifeq ($(WITH_020_LIB),yes)
+	install -m 755 -d ${slblibdir}/m68020-60
+	install -m 755 src/gemma32020.slb ${slblibdir}/m68020-60/gemma32.slb
+endif
+	install -m 755 kernel32/.lib/kernel32.slb ${slblibdir}
+ifeq ($(WITH_020_LIB),yes)
+	install -m 755 kernel32/.lib020/kernel32.slb ${slblibdir}/m68020-60
+endif
+ifeq ($(WITH_V4E_LIB),yes)
+	install -m 755 kernel32/.libv4e/kernel32.slb ${slblibdir}/m5475
+endif
+
+uninstall:
+	rm -f ${slbincludedir}/gemma-struct.h
+	rm -f ${slbincludedir}/gemma.h
+	rm -f ${slbincludedir}/kernel.h
+	rm -f ${libdir}/libgemma.a
+	rm -f ${libdir}/m68020-60/libgemma.a
+	rm -f ${libdir}/m5475/libgemma.a
+	rm -f ${slblibdir}/gemma32.slb
+	rm -f ${slblibdir}/m68020-60/gemma32.slb
+	rm -f ${slblibdir}/m5475/gemma32.slb
+	rm -f ${slblibdir}/kernel32.slb
+	rm -f ${slblibdir}/m68020-60/kernel32.slb
+	rm -f ${slblibdir}/m5475/kernel32.slb

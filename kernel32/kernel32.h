@@ -24,13 +24,13 @@
 #include <signal.h>
 #include <time.h>
 #include <sys/time.h>
+#include <gem.h>
 
 #ifdef __MSHORT__
 # error "the kernel32.slb must not be compiled with -mshort"
 #endif
 struct check_not_mshort { unsigned int error_if_negative: sizeof(int) == 4 ? 1 : -1; };
 
-#include "../../gemlib/gem.h"
 
 #include "../config.h"
 
