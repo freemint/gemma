@@ -19,7 +19,7 @@ include $(srcdir)/../VERSION
 all-here: objs
 
 # default overwrites
-INCLUDES = -I$(top_srcdir)/gemma/include/ -I$(top_srcdir)/gemlib/
+INCLUDES = -I$(top_srcdir)/include
 GENERAL += 
 DEFINITIONS =
 
