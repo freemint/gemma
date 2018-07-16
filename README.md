@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/freemint/gemma.svg?branch=master)](https://travis-ci.org/freemint/gemma)
+
 To build everything do `gmake install'. Notice that you have first to 
 have built the gemlib (for the mt_gem.h header).
 
