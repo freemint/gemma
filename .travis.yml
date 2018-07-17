@@ -20,5 +20,8 @@ before_script:
 script:
   - sh ./.travis/build.sh "${PWD}/.travis/tmp" "${PWD}/.travis/out"
 
-after_success:
+deploy:
+  skip_cleanup: true
+  on:
+    repo: freemint/gemma
   - sh ./.travis/deploy.sh "${PWD}/.travis/out" $encrypted_98555d3c3096_key $encrypted_98555d3c3096_iv
