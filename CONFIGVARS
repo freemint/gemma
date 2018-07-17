@@ -33,7 +33,7 @@ NATIVECFLAGS = -O
 CRLF = echo crlf -s
 
 PREFIX=$(shell $(CROSSPREFIX)gcc -print-sysroot)/usr
-ifeq ($(PREFIX),)
+ifeq ($(PREFIX),/usr)
   PREFIX=/usr/$(CROSS_TOOL)
 endif
 
