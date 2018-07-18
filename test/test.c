@@ -31,7 +31,7 @@ deselect(WINDIAL *wd, short obj)
 {
 	OBJECT *ob = wd->wb_treeptr;
 
-	if ((!(ob[obj].ob_state & OS_WHITEBAK) && !(ob[obj].ob_flags & OF_RBUTTON)))
+	if (!(ob[obj].ob_flags & OF_RBUTTON))
 		objc_xchange(wd, obj, ob[obj].ob_state & ~OS_SELECTED, 1);
 }
 
@@ -91,6 +91,9 @@ do_windows()
 	{
 		ulong m;
 		ushort tree, obj;
+
+		if (!(win_1->wb_ontop & 2) && !(win_2->wb_ontop & 2))
+			break;
 
 		m = windial_formdo(current);
 
