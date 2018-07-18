@@ -20,7 +20,7 @@
 	.globl	C_SYMBOL_NAME(_base)
 
 #ifndef STACKSIZE
-#define STACKSIZE 0x1000
+#define STACKSIZE 0x4000
 #endif
 
 	.data
