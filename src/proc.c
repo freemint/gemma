@@ -137,7 +137,7 @@ proc_exec(BASEPAGE *bp, long fn, short nargs, \
 	if ((nargs < 6) || !proc) proc = get_contrl(bp);
 
 	if (flags & 4)
-		dos_signal(proc, SIGCHLD, sig_child);
+		(void)dos_signal(proc, SIGCHLD, sig_child);
 
 	if (flags & 3)
 	{
@@ -239,7 +239,7 @@ thread_fork(BASEPAGE *bp, long fn, short nargs, void *startup, void *address, co
 	if (mode & 1)
 	{
 		DEBUGMSG("setup SIGCHLD");
-		oldsig = dos_signal(proc, SIGCHLD, sig_child);
+		oldsig = (long)dos_signal(proc, SIGCHLD, sig_child);
 	}
 
 	DEBUGMSG("executing thread");
@@ -255,7 +255,7 @@ thread_fork(BASEPAGE *bp, long fn, short nargs, void *startup, void *address, co
 	{
 		DEBUGMSG("cancelling SIGCHLD");
 
-		dos_signal(proc, SIGCHLD, (void *)oldsig);
+		(void)dos_signal(proc, SIGCHLD, (void *)oldsig);
 	}
 
 	DEBUGMSG("complete");
