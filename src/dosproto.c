@@ -381,6 +381,12 @@ long dos_fsize(PROC_ARRAY *proc, const char *name)
 }
 
 
+long dos_fexists(PROC_ARRAY *proc, const char *fname)
+{
+	return dos_fsize(proc, fname) < 0 ? -ESRCH : 0;
+}
+
+
 long dos_fsearch(PROC_ARRAY *proc, const char *name, char *fullname, const char *pathvar)
 {
 	const char *path;
@@ -405,9 +411,98 @@ long dos_fsearch(PROC_ARRAY *proc, const char *name, char *fullname, const char 
 	return -ESRCH;
 }
 
+
 const char *dos_getenv(PROC_ARRAY *proc, const char *var)
 {
 	return bp_getenv(proc->base, var);
+}
+
+
+static size_t env_strlen(const char *str)
+{
+	size_t len = 0;
+
+	while (str && *str)
+	{
+		do
+		{
+			++str;
+			++len;
+		} while (*str);
+		++str;
+		++len;
+	}
+	++len;
+	return len;
+}
+
+
+long dos_delenv(PROC_ARRAY *proc, const char *var)
+{
+	char *value;
+	char *next;
+	BASEPAGE *bp;
+
+	bp = proc->base;
+	value = bp_getenv(bp, var);
+	if (value == NULL)
+		return 0;
+	value -= strlen(var);
+	next = value + strlen(value) + 1;
+	while (*next)
+	{
+		while ((*value++ = *next++) != '\0')
+			;
+	}
+	*value = '\0';
+	return Mshrink(bp->p_env, env_strlen(bp->p_env));
+}
+
+
+long dos_setenv(PROC_ARRAY *proc, const char *var, const char *value)
+{
+	size_t envlen;
+	char *env, *newenv;
+	const char *oldvalue;
+	char *end;
+	BASEPAGE *bp;
+	
+	if (var == NULL)
+		return -EBADARG;
+	if (value == NULL)
+		return dos_delenv(proc, var);
+	bp = proc->base;
+	env = bp->p_env;
+	envlen = env_strlen(env);
+	envlen += strlen(value) + 2;
+	if ((oldvalue = bp_getenv(bp, var)) != NULL)
+	{
+		envlen -= strlen(oldvalue);
+	} else
+	{
+		envlen += strlen(var);
+	}
+	newenv = (char *)Mxalloc(envlen, MX_PREFTTRAM);
+	if (newenv == NULL)
+		return 0;
+	dos_delenv(proc, var);
+	end = newenv;
+	if (*env != '\0')
+	{
+		while (*env)
+		{
+			while ((*end++ = *env++) != '\0')
+				;
+		}
+	}
+	strcpy(end, var);
+	strcat(end, "=");
+	strcat(end, value);
+	end[strlen(end) + 1] = '\0';
+	Mfree(bp->p_env);
+	bp->p_env = newenv;
+
+	return 0;
 }
 
 
@@ -488,6 +583,45 @@ do_exec:
 }
 
 
+long dos_fload(PROC_ARRAY *proc, const char *fname, char **buf, long *size, short *mode)
+{
+	long fsize;
+	struct xattr xattr;
+	long ret;
+	long handle;
+	char *bufp;
+
+	if ((fsize = dos_fsize(proc, fname)) < 0)
+		return fsize;
+	if (fsize == 0)
+		return -EEOF;
+	*size = fsize;
+	if (Fxattr(0, fname, &xattr) == 0)
+	{
+		*mode = xattr.st_mode;
+	}
+	if ((ret = (long)Mxalloc(fsize, MX_PREFTTRAM|MX_PRIVATE)) < 0)
+		return ret;
+	bufp = (char *)ret;
+	*buf = bufp;
+	if ((ret = Fopen(fname, FO_READ)) >= 0)
+	{
+		handle = ret;
+		ret = Fread(handle, fsize, bufp);
+		Fclose(handle);
+		if (ret >= 0 && ret != fsize)
+			ret = -EREAD;
+	}
+	if (ret < 0)
+	{
+		Mfree(bufp);
+		*buf = NULL;
+		return ret;
+	}
+	return 0;
+}
+
+
 long dos_floadbuf(PROC_ARRAY *proc, const char *fname, char *buf, long size, short *mode)
 {
 	long fsize;
@@ -518,5 +652,64 @@ long dos_floadbuf(PROC_ARRAY *proc, const char *fname, char *buf, long size, sho
 		return ret;
 	return 0;
 }
+
+
+long dos_fsave(PROC_ARRAY *proc, const char *fname, const void *buf, long size, short mode)
+{
+	char namebuf[PATH_MAX];
+	long ret;
+	long handle;
+	
+	strcpy(namebuf, fname);
+	strcat(namebuf, ".orig");
+	Fdelete(namebuf);
+	ret = Frename(0, fname, namebuf);
+	if (ret < 0)
+		return ret;
+	handle = Fcreate(fname, 0);
+	if (handle < 0)
+		return handle;
+	ret = Fwrite(handle, size, buf);
+	Fclose(handle);
+	if (ret < 0)
+		return ret;
+	if (ret != size)
+		return -EWRITE;
+	Fchmod(fname, mode & ALLPERMS);
+	return 0;
+}
+
+
+long dos_finfdir(PROC_ARRAY *proc, char *buf, long blen)
+{
+	const char *home;
+	const char *orighome;
+	long ret;
+	BASEPAGE *bp;
+
+	UNUSED(blen);
+	bp = proc->base;
+	home = orighome = bp_getenv(bp, "HOME=");
+	if (home == NULL)
+		home = ".";
+	strcpy(buf, home);
+	strcat(buf, "\\defaults");
+	if (dos_fexists(proc, buf) == 0)
+	{
+		strcat(buf, "\\");
+		return 0;
+	}
+	strcpy(buf, home);
+	ret = orighome != NULL ? dos_fexists(proc, buf) : 0;
+	if (ret == 0)
+	{
+		if (orighome != NULL)
+			strcat(buf, "\\");
+		return 0;
+	}
+	strcpy(buf, ".\\");
+	return 0;
+}
+
 
 #endif /* _USE_KERNEL32 */

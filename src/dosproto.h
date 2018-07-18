@@ -32,9 +32,15 @@
 
 const char *dos_serror(PROC_ARRAY *proc, long error);
 long dos_fsize(PROC_ARRAY *proc, const char *name);
+long dos_fexists(PROC_ARRAY *proc, const char *fname);
 long dos_fsearch(PROC_ARRAY *proc, const char *name, char *fullname, const char *envvar);
 const char *dos_getenv(PROC_ARRAY *proc, const char *var);
+long dos_setenv(PROC_ARRAY *proc, const char *var, const char *value);
+long dos_delenv(PROC_ARRAY *proc, const char *var);
+long dos_fload(PROC_ARRAY *proc, const char *name, char **buf, long *size, short *mode);
 long dos_floadbuf(PROC_ARRAY *proc, const char *name, char *buf, long len, short *mode);
+long dos_fsave(PROC_ARRAY *proc, const char *fname, const void *buf, long size, short mode);
+long dos_finfdir(PROC_ARRAY *proc, char *buf, long blen);
 
 long dos_pexec(PROC_ARRAY *proc, long mode, const char *cmd, const char *tail, const char *env);
 

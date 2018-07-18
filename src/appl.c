@@ -19,6 +19,7 @@
 # include <errno.h>
 # include <string.h>
 # include <mintbind.h>
+# include <stdarg.h>
 
 # include "gemma.h"
 # include "gemproto.h"
@@ -166,6 +167,111 @@ appl_close(BASEPAGE *bp, long fn, short nargs, PROC_ARRAY *p)
 	return 0;
 }
 
+#if !_USE_KERNEL32
+/*
+ * interface to some functions from kernel32.slb, when we don't load it.
+ * Needed eg. by configtool
+ */
+static long kernel32(SLB_HANDLE sl, long fn, short nargs, ...)
+{
+	long ret = -1;
+	va_list args;
+	PROC_ARRAY *proc;
+	BASEPAGE *bp = (BASEPAGE *)sl;
+
+	va_start(args, nargs);
+	proc = get_contrl(bp);
+	switch (fn & 0xffff)
+	{
+	case 0x200:
+		{
+			long error = va_arg(args, long);
+			ret = (long)dos_serror(proc, error);
+		}
+		break;
+	case 0x201:
+		{
+			const char *name = va_arg(args, const char *);
+			ret = dos_fsize(proc, name);
+		}
+		break;
+	case 0x202:
+		{
+			const char *name = va_arg(args, const char *);
+			ret = dos_fexists(proc, name);
+		}
+		break;
+	case 0x203:
+		{
+			const char *name = va_arg(args, const char *);
+			char *fullname = va_arg(args, char *);
+			const char *pathvar = va_arg(args, const char *);
+			ret = dos_fsearch(proc, name, fullname, pathvar);
+		}
+		break;
+	case 0x204:
+		/* dos_pbase */
+		ret = (long)bp;
+		break;
+	case 0x205:
+		{
+			const char *name = va_arg(args, const char *);
+			char **buf = va_arg(args, char **);
+			long *size = va_arg(args, long *);
+			short *mode = va_arg(args, short *);
+			ret = dos_fload(proc, name, buf, size, mode);
+		}
+		break;
+	case 0x206:
+		{
+			const char *name = va_arg(args, const char *);
+			char *buf = va_arg(args, char *);
+			long size = va_arg(args, long);
+			short mode = va_arg(args, int);
+			ret = dos_fsave(proc, name, buf, size, mode);
+		}
+		break;
+	case 0x207:
+		{
+			char *buf = va_arg(args, char *);
+			long blen = va_arg(args, long);
+			ret = (long)dos_finfdir(proc, buf, blen);
+		}
+		break;
+	case 0x208:
+		{
+			const char *var = va_arg(args, const char *);
+			ret = (long)dos_getenv(proc, var);
+		}
+		break;
+	case 0x209:
+		{
+			const char *var = va_arg(args, const char *);
+			const char *value = va_arg(args, const char *);
+			ret = (long)dos_setenv(proc, var, value);
+		}
+		break;
+	case 0x20a:
+		{
+			const char *var = va_arg(args, const char *);
+			ret = (long)dos_delenv(proc, var);
+		}
+		break;
+	case 0x20b:
+		{
+			const char *name = va_arg(args, const char *);
+			char *buf = va_arg(args, char *);
+			long size = va_arg(args, long);
+			short *mode = va_arg(args, short *);
+			ret = dos_floadbuf(proc, name, buf, size, mode);
+		}
+		break;
+	}
+	va_end(args);
+	return ret;
+}
+#endif
+
 /* flag extension (bits):
  * 0 - don't load RSC, only alloc (if possible)
  * 1 - don't shel_write(SWM_NEWMSG)
@@ -198,6 +304,9 @@ appl_open(BASEPAGE *bp, long fn, short nargs, \
 
 	if (r < 0)
 		return r;
+#else
+	proc->kern.handle = (SLB_HANDLE)bp;
+	proc->kern.exec = kernel32;
 #endif
 
 	apid = _appl_init(proc);
