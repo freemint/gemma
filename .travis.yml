@@ -23,6 +23,6 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script: sh ./.travis/deploy.sh "${PWD}/.travis/out" $encrypted_98555d3c3096_key $encrypted_98555d3c3096_iv
+  script: sh ./.travis/deploy.sh "${PWD}/.travis/out" $encrypted_1f0de6eac58a_key $encrypted_1f0de6eac58a_iv
   on:
     repo: freemint/gemma
