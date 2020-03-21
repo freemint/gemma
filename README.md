@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/freemint/gemma.svg?branch=master)](https://travis-ci.org/freemint/gemma)
+[![Build Status](https://travis-ci.org/freemint/gemma.svg?branch=master)](https://travis-ci.org/freemint/gemma) [ ![Download](https://api.bintray.com/packages/freemint/freemint/gemma/images/download.svg) ](https://bintray.com/freemint/freemint/gemma/_latestVersion)
 
 To build everything do `gmake install'. Notice that you have first to 
 have built the gemlib (for the mt_gem.h header).
