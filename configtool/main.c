@@ -130,6 +130,18 @@ static const short buttons[] =
 
 # define NUMSET	10
 
+#if __GNUC_PREREQ(4, 8) || !defined(__LTO__)
+/* avoid a library call to memcpy which we don't have */
+__attribute__((optimize("-O1")))
+#endif
+static void copy_prefs(long *prefs, long *settings)
+{
+	short x;
+
+	for (x = 0; x < NUMSET; x++)
+		prefs[x + 7] = settings[x];
+}
+
 static void
 do_window(WINDIAL *wd)
 {
@@ -224,8 +236,7 @@ do_window(WINDIAL *wd)
 				if (!a)
 					return;
 
-				for (x = 0; x < NUMSET; x++)
-					prefs[x + 7] = settings[x];
+				copy_prefs(prefs, settings);
 				a = dos_fsave(fullname, libbuf, liblen, libmode);
 				if (a < 0)
 				{
