@@ -151,7 +151,7 @@ extern short menu_height;		/* in appl.c */
 void debug_print(const char *fn, const char *string);
 # endif
 
-const long sema_users;
+extern const long sema_users;
 
 void bin2asc(long number, char *out);			/* in bodajze alert.c */
 OBJECT *obj2addr(PROC_ARRAY *proc, short type, ulong obj);
