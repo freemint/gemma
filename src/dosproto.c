@@ -544,7 +544,8 @@ long dos_pexec(PROC_ARRAY *proc, long mode, const char *ptr1, const char *ptr2, 
 
 	if (mkname)
 	{
-		strncpy(namebuf, ptr1, sizeof(namebuf));
+		strncpy(namebuf, ptr1, sizeof(namebuf) - 1);
+		namebuf[sizeof(namebuf) - 1] = '\0';
 		name = namebuf;
 		for (i = 0; i < sizeof(namebuf); i++)
 		{

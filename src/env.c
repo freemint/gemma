@@ -132,7 +132,8 @@ env_eval(BASEPAGE *bp, long fn, short nargs, \
 		e = *env++;
 		if ((e == '$') && *env && (*env != '$'))
 		{
-			strncpy(tmp, env, sizeof(tmp));
+			strncpy(tmp, env, sizeof(tmp) - 1);
+			tmp[sizeof(tmp) - 1] = '\0';
 			for (x = 0; x < (sizeof(tmp)-1); x++)
 			{
 				if ((tmp[x] >= '0') || (tmp[x] <= '9') || \

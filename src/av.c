@@ -48,8 +48,8 @@ get_server(PROC_ARRAY *proc, const char *server)
 	if (!av)
 		return -ENOENT;
 
-	bzero(tmp, sizeof(tmp));
-	strncpy(tmp, av, sizeof(tmp));
+	strncpy(tmp, av, sizeof(tmp) - 1);
+	tmp[sizeof(tmp) - 1] = '\0';
 
 	for (x = 0; x < sizeof(tmp); x++)
 	{
@@ -354,7 +354,8 @@ open_url(BASEPAGE *bp, long fn, short nargs, const char *url, PROC_ARRAY *p)
 
 	/* XXX: should construct ARGV command line */
 
-	strncpy(cmd + 1, url, 127);
+	strncpy(cmd + 1, url, 126);
+	cmd[sizeof(cmd - 1)] = '\0';
 	len = strlen(url);
 	if (len > 0x7e)
 		len = 0x7e;
