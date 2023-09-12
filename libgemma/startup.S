@@ -16,9 +16,11 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-	.globl	__startup
+#include "../symbols.h"
 
-__startup:
+	.globl	C_SYMBOL_NAME(_startup)
+
+C_SYMBOL_NAME(_startup):
 	move.l	4(%sp),%a0		/* basepage address */
 
 	move.l	44(%a0),-(%sp)	/* release own environment */
