@@ -30,6 +30,11 @@ __dummy:	.long	0x11111918
 	.comm	__stack,STACKSIZE
 
 	.text
+
+| This special label ensures that this code is used as entry point,
+| even if the linker doesn't put it at the start of the TEXT segment.
+	.globl	C_SYMBOL_NAME(_start)
+C_SYMBOL_NAME(_start):
 	movel	%sp@(0x04),%a0	| basepage address
 
 	lea	__stack+STACKSIZE-0x0040,%sp

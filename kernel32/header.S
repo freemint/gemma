@@ -21,6 +21,10 @@
 
 #define WITH_FUNCNAMES 1
 
+	| This special label ensures that this code is used as entry point,
+	| even if the linker doesn't put it at the start of the TEXT segment.
+	.globl	C_SYMBOL_NAME(_start)
+C_SYMBOL_NAME(_start):
 	.long	0x70004afc	                    /* magic value (clr.l d0, illegal) */
 	.long	_slbname	                    /* pointer to library's (file)name */
 	.long	0x0100	                        /* version number */
