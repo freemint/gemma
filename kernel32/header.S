@@ -15,11 +15,16 @@
  * along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-	.text
 
 #include "symbols.h"
 
 #define WITH_FUNCNAMES 1
+
+#ifdef __ELF__
+	.section	.text.startup
+#else
+	.text
+#endif
 
 	| This special label ensures that this code is used as entry point,
 	| even if the linker doesn't put it at the start of the TEXT segment.
