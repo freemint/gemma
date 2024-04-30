@@ -37,7 +37,6 @@ VPATH = ..
 
 gemma32.slb: $(OBJS)
 	$(AM_V_CCLD)$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(OBJS) $(LIBS)
-	$(AM_V_STRIP)$(STRIP) $@
-
+	$(AM_V_STRIP)$(CROSSPREFIX)stripex $@
 
 include $(top_srcdir)/DEPENDENCIES
