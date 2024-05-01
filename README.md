@@ -1,6 +1,8 @@
 [![Build Status](https://github.com/freemint/gemma/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/freemint/gemma/actions) 
 
-Latest snapshot: [Download](https://tho-otto.de/snapshots/gemma/gemma-latest.tar.bz2)
+* Latest snapshot: [Download (mint)](https://tho-otto.de/snapshots/gemma/gemma-mint-latest.tar.bz2)
+* Latest snapshot: [Download (mintelf)](https://tho-otto.de/snapshots/gemma/gemma-mintelf-latest.tar.bz2)
+* [Archive](https://tho-otto.de/snapshots/gemma/)
 
 To build everything do `gmake install'. Notice that you have first to 
 have built the gemlib (for the mt_gem.h header).
