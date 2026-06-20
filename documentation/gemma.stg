@@ -2,7 +2,7 @@
 @author   "Draco (draco@atari.org)"
 @subject  Documentation/Manual
 @$VER: gemma.stg (@:"__DATE__")
-@options "-s +i +zz"
+@options "-s +i +z"
 
 @node "Main"
 @title "The GEM application support library"
